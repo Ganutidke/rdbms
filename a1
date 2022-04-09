@@ -1,0 +1,17 @@
+create or replace function count_per() returns int as'
+declare 
+num int;
+begin
+select count(pid) into num from person where pcity=''pune'';
+return num;
+end;'
+language 'plpgsql';
+
+
+
+
+AS=# select count_per();
+ count_per 
+-----------
+         2
+(1 row)
