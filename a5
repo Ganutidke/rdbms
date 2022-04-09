@@ -1,0 +1,36 @@
+CREATE FUNCTION get_e()RETURNS text AS' 
+DECLARE
+c1 cursor for select efname,elname from emp;
+f_name text;
+l_name emp.elname%TYPE;
+BEGIN 
+open c1;
+loop
+fetch c1 into f_name,l_name;
+exit when not found;
+RAISE NOTICE ''f_name: %'', f_name; 
+RAISE NOTICE ''l_name: %'', l_name;
+end loop;
+close c1;
+return null;
+END;'
+LANGUAGE 'plpgsql';
+
+
+
+
+Output:
+
+AS=# select get_e();
+NOTICE:  f_name: abc
+NOTICE:  l_name: joshi
+NOTICE:  f_name: def
+NOTICE:  l_name: pawar
+NOTICE:  f_name: xyz
+NOTICE:  l_name: chavan
+NOTICE:  f_name: abc
+NOTICE:  l_name: pawar
+ get_e 
+-------
+ 
+(1 row)
