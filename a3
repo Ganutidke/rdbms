@@ -1,0 +1,30 @@
+create or replace function display() returns int as'
+declare
+c1 cursor for select sname,slname from stud;
+s_name char(20);
+begin
+open c1;
+loop
+fetch c1 into s_name;
+exit when not found;
+raise notice ''Name of student is %'',s_name;
+end loop;
+close c1;
+return null;
+end;'
+language 'plpgsql';
+
+
+
+
+
+Output:
+
+NOTICE:  Name of student is abc                 
+NOTICE:  Name of student is def                 
+NOTICE:  Name of student is pqr                 
+ display 
+---------
+        
+(1 row)
+
