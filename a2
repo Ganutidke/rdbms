@@ -1,0 +1,26 @@
+create or replace function display1() returns int as'
+declare
+c1 cursor for select count(sname) from stud;
+num int;
+begin
+open c1;
+loop
+fetch c1 into num;
+exit when not found;
+raise notice ''No of student is %'',num;
+end loop;
+close c1;
+return null;
+end;'
+language 'plpgsql';
+
+
+
+
+Output:
+
+NOTICE:  No of student is 3
+ display1 
+----------
+         
+(1 row)
