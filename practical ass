@@ -1,0 +1,136 @@
+1.Consider the following database 
+Doctor (d_no int, d_name varchar(30), specialization varchar(35), charges int) Hospital (h_no int, h_name varchar(20), city varchar(10)) 
+Doctor and Hospital are related with many to one relationship. 
+ A Create the above database in PostGreSQL and insert sufficient records. [5 marks] 
+B Execute any two of the following using PL/pgSQL 
+i. Write a trigger before insert/update on Doctor table. Raise exception if charges are <0 . 
+ii. Write a function which will accept the name of the doctor and print the hospital details that the doctor is visiting. 
+iii. Write a function using cursor to accept the city name and print the names of all hospitals in that city. 
+
+
+AS=# create table hosp(h_no int primary key,hname varchar(20),hcity varchar(20));
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "hosp_pkey" for table "hosp"
+CREATE TABLE
+AS=# insert into hosp values(1,'jupitor','pune');
+INSERT 0 1
+AS=# insert into hosp values(2,'Star','akurdi');
+INSERT 0 1
+AS=# insert into hosp values(3,'abcd','mumbai');
+INSERT 0 1
+AS=# select * from hosp;
+ h_no |  hname  | hcity  
+------+---------+--------
+    1 | jupitor | pune
+    2 | Star    | akurdi
+    3 | abcd    | mumbai
+(3 rows)
+
+
+AS=# create table doctor2(dno int primary key,dname varchar(20),spec varchar(20),charges int,h_no int references hosp);
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "doctor2_pkey" for table "doctor2"
+CREATE TABLE
+AS=# insert into doctor2 values(1,'ajay','radiology',10000,2);
+INSERT 0 1
+AS=# insert into doctor2 values(6,'asha','nerology',20000,3);
+INSERT 0 1
+AS=# insert into doctor2 values(7,'ashok','genral',20000,1);
+INSERT 0 1
+AS=# select * from doctor2;
+ dno | dname |   spec    | charges | h_no 
+-----+-------+-----------+---------+------
+   1 | ajay  | radiology |   10000 |    2
+   6 | asha  | nerology  |   20000 |    3
+   7 | ashok | genral    |   20000 |    1
+(3 rows)
+
+
+
+1.create or replace function d() returns trigger as'
+begin
+if(new.charges<0)then
+raise exception ''Charges are zero'';
+end if;
+return new;
+end;'
+language 'plpgsql';
+
+CREATE FUNCTION
+
+
+create trigger d after insert or update on doctor1 for each row execute procedure d();
+
+CREATE TRIGGER
+
+
+Output:
+
+AS=# insert into doctor1 values(5,'akshy','radiology',-1,1);
+ERROR:  Charges are zero
+
+
+2.CREATE FUNCTION s4(varchar)RETURNS varchar AS' 
+DECLARE
+r record;
+BEGIN 
+select into r * from hosp,doctor2 where hosp.h_no=doctor2.h_no;
+return r.hname||'' ''||r.hcity;
+END;'
+LANGUAGE 'plpgsql';
+
+
+Output:
+AS=# select s4('ajay');
+     s4      
+-------------
+ Star akurdi
+(1 row)
+
+
+3.create or replace function display1(varchar) returns varchar as'
+declare
+c1 cursor for select hname from hosp;
+h_name char(20);
+begin
+open c1;
+loop
+fetch c1 into h_name;
+exit when not found;
+raise notice ''Name of Hospitals is :%'',h_name;
+end loop;
+close c1;
+return null;
+end;'
+language 'plpgsql';
+
+output:
+
+
+AS=# select display1('mumbai');
+NOTICE:  Name of Hospitals is :jupitor             
+NOTICE:  Name of Hospitals is :Star                
+NOTICE:  Name of Hospitals is :abcd                
+ display1 
+----------
+ 
+(1 row)
+
+
+
+2. Consider the following database 
+Student (roll_no integer, name varchar(30), address varchar(50), class varchar(10)) Subject (scode varchar(10), subject_name varchar(20)) 
+Student-Subject are related with M-M relationship with attributes marks_scored. 
+A. Create the above database in PostGreSQL and insert sufficient records. 
+B. Execute any two of the following using PL/pgSQL 
+i. Write a function which will accept the roll no and print all the details of that student. 
+ii. Write a function using cursor which will accept the name of the subject and print the roll_no, name and marks of all students for that subject. 
+iii. Write a trigger which is executed when insertion is made in the student-subject table. If marks_scored is less than 0, give appropriate message and do not allow the insertion. 
+
+
+3.Consider the following database 
+Customer (cno integer, cname varchar(20), city varchar(20)) 
+Account (a_no int, a_type varchar(10), opening_date date, balance money) Customer and Account are related with one to many relationship 
+ A Create the above database in PostGreSQL and insert sufficient records. 
+B Execute any two of the following using PL/pgSQL 
+i. Write a function which accepts account no as input and prints the details of that account. 
+ii. Write a function using cursor which accepts customer name and prints all account details of that customer. If the customer name is invalid, print appropriate message. 
+iii. Write a trigger which is executed whenever update is made to the account table. If the balance becomes less than 1000, print an error message that balance cannot be less than 1000. 
